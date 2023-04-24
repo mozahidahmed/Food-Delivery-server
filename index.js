@@ -17,11 +17,20 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 
 
-
 async function run() {
     try {
         await client.connect();
-        const serviceCollection = client.db('pandami').collection('rasturent');
+        const restaurantsCollection = client.db('restaurants').collection('allrasturents');
+
+
+
+        app.get('/restaurants', async (req, res) => {
+            const query = {};
+            const cursor = restaurantsCollection.find(query);
+            const restaurants = await cursor.toArray();
+            res.send(restaurants);
+
+        })
         
     }
 
