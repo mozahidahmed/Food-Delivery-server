@@ -99,7 +99,7 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc, option);
             //token
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1h' })
-             console.log(token)
+            console.log(token)
             res.send({ result, token });
 
         })
@@ -133,6 +133,12 @@ async function run() {
         app.get('/user',  async (req, res) => {
             const user = await userCollection.find().toArray();
             res.send(user)
+        })
+        app.delete('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await userCollection.deleteOne(query)
+            res.send(result)
         })
 
 //.............
