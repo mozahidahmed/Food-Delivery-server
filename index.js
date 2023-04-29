@@ -40,6 +40,7 @@ async function run() {
     try {
         await client.connect();
         const restaurantsCollection = client.db('restaurants').collection('allrasturents');
+        const allFoodsCollection = client.db('restaurants').collection('allfoods');
         const orderCollection = client.db('restaurants').collection('order');
         const userCollection = client.db('restaurants').collection('user');
         const reviewsCollection = client.db('restaurants').collection('reviews');
@@ -84,7 +85,10 @@ async function run() {
             res.send(result);
         })
 
-        app.put('/user/:email', async (req, res) => {
+
+//............
+     //01. token 
+       app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body
             const filter = { email: email };
@@ -99,10 +103,82 @@ async function run() {
             res.send({ result, token });
 
         })
+        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            const requester = req.decoded.email
+            const requesterAccount = await userCollection.findOne({ email: requester });
+            if (requesterAccount.role === 'admin') {
+                const filter = { email: email };
+                const updateDoc = {
+                    $set: { role: 'admin' },
+                }
+                const result = await userCollection.updateOne(filter, updateDoc);
+                res.send(result);
+
+            }
+            else {
+                res.status(403).send({ message: 'forbidden' })
+            }
+        })
+
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+
+        })
+
+        //get user for load dashboard
+        app.get('/user',  async (req, res) => {
+            const user = await userCollection.find().toArray();
+            res.send(user)
+        })
+
+//.............
 
 
 
+
+
+
+
+
+
+
+        app.get('/myorder', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const order = await orderCollection.find(query).toArray();
+            res.send(order)
+
+        })
+          app.delete('/myorder/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await orderCollection.deleteOne(query)
+            res.send(result)
+        })
         
+
+        app.get('/allfood', async (req, res) => {
+            const query = {};
+              const cursor = allFoodsCollection.find(query);
+            const allfood = await cursor.toArray();
+            res.send(allfood);
+        });
+
+        app.post('/addfood', async (req, res) => {
+            const review = req.body;
+            const result = await allFoodsCollection.insertOne(review)
+            res.send(result)
+        })
+        app.delete('/allfood/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await allFoodsCollection.deleteOne(query)
+            res.send(result)
+        })
         
     }
 
