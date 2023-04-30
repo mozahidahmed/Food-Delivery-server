@@ -45,6 +45,19 @@ async function run() {
         const userCollection = client.db('restaurants').collection('user');
         const reviewsCollection = client.db('restaurants').collection('reviews');
 
+       
+        const birthdayCollection = client.db('restaurants').collection('birthday');
+        const giftCollection = client.db('restaurants').collection('gift');
+        const partyCollection = client.db('restaurants').collection('party');
+        const nightDrinkCollection = client.db('restaurants').collection('nightDrink');
+
+        const breakfastCollection = client.db('restaurants').collection('breakfast');
+        const lunchCollection = client.db('restaurants').collection('lunch');
+        const dinnerCollection = client.db('restaurants').collection('dinner');
+        const morningCoffeeCollection = client.db('restaurants').collection('morningcoffee');
+
+
+
 
 
         app.get('/restaurants', async (req, res) => {
@@ -53,14 +66,78 @@ async function run() {
             const restaurants = await cursor.toArray();
             res.send(restaurants);
         })
-
-        
         app.get('/restaurants/:id', async (req, res) => {
             const id = req.params.id;
-            const query={_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const restaurants = await restaurantsCollection.findOne(query);
             res.send(restaurants);
         })
+
+        //celebration food
+        app.get('/birthday', async (req, res) => {
+            const query = {};
+            const cursor = birthdayCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/gift', async (req, res) => {
+            const query = {};
+            const cursor = giftCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/party', async (req, res) => {
+            const query = {};
+            const cursor = partyCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/nightdrink', async (req, res) => {
+            const query = {};
+            const cursor = nightDrinkCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+        //menu food
+        app.get('/breakfast', async (req, res) => {
+            const query = {};
+            const cursor = breakfastCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/lunch', async (req, res) => {
+            const query = {};
+            const cursor = lunchCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/dinner', async (req, res) => {
+            const query = {};
+            const cursor = dinnerCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/morningcoffee', async (req, res) => {
+            const query = {};
+            const cursor = morningCoffeeCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+
+
+
+        
+
+
+
+
+
+      
+       
 
 
         app.post('/order', async (req, res) => {
