@@ -13,7 +13,7 @@ app.use(express.json());
 
 
 //connection database
-const uri = "mongodb+srv://service:WqppylUxViB54LVR@cluster0.ro517.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.ro517.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
@@ -245,10 +245,25 @@ async function run() {
         
 
         app.get('/allfood', async (req, res) => {
+             console.log('query',req.query)
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
             const query = {};
-              const cursor = allFoodsCollection.find(query);
-            const allfood = await cursor.toArray();
+            const cursor = allFoodsCollection.find(query);
+            let allfood;
+            if(page || size){
+                allfood = await cursor.skip(page * size).limit(size).toArray();
+            }
+            else{
+                allfood = await cursor.toArray();
+            }
             res.send(allfood);
+        });
+        app.get('/allfoodCount', async (req, res) => {
+            const query = {};
+            const cursor = allFoodsCollection.find(query);
+            const count = await cursor.count();
+            res.send({count});
         });
 
         app.post('/addfood', async (req, res) => {
